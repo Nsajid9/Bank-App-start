@@ -1,8 +1,15 @@
+# First stage: Build the application
 FROM maven:3-eclipse-temurin-21 AS build
-COPY . .
+
+WORKDIR /app
+COPY . .  
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:21-alpine
-COPY --from=build /target/*.jar bankapp.jar
+# Second stage: Run the application
+FROM openjdk:21-alpine  # Using OpenJDK as an alternative
+
+WORKDIR /app
+COPY --from=build /app/target/*.jar bankapp.jar  
+
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","bankapp.jar"]
+ENTRYPOINT ["java", "-jar", "bankapp.jar"]
